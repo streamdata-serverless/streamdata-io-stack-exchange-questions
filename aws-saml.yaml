@@ -1,0 +1,30 @@
+﻿AWSTemplateFormatVersion: '2010-09-09'
+Transform: 'AWS::Serverless-2016-10-31'
+Description: This is a demo of a streaming Stack Exchange questions using Streamdata.io, pulling data via the API and turn it into a streaming API using Server-Sent Events, applying incremental updates using JSON Patch, then publishing the stream results to a Amazon S3 data lake.
+Resources:
+  streamdataiostackexchangequestions:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      Handler: index.handler
+      Runtime: nodejs6.10
+      CodeUri: s3://streamdata-serverless/streamdata-io-stack-exchange-questions/package.zip
+      Description: This is a demo of a streaming Stack Exchange questions using Streamdata.io, pulling data via the API and turn it into a streaming API using Server-Sent Events, applying incremental updates using JSON Patch, then publishing the stream results to a Amazon S3 data lake.
+      MemorySize: 128
+      Timeout: 30
+      Policies:
+        - LambdaInvokePolicy:
+            FunctionName: streamdata-io-stack-exchange-questions
+        - S3CrudPolicy:
+            BucketName: streaming-data-lake
+      Environment:
+        Variables:
+          targetUrl: https://api.stackexchange.com/2.2/questions
+          s3bucket: streaming-data-lake
+          targetFolder: stack-exchange-data
+          appToken: Streamdata.io-Application-Token
+          order: desc
+          sort: activity
+          site: stackoverflow
+          tagged: kafka
+          access_token: Stack-Exchange-Access-Token
+          key: Stack-Exchange-Key
